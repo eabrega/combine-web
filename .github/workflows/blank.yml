@@ -30,4 +30,3 @@ jobs:
           script: |
             docker rm -f combine-web-1
             docker run -id -p 7201:80 --name combine-web-1 eabrega/combine-web:$TAG
-          echo test, and deploy your project.
