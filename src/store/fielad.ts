@@ -6,7 +6,7 @@ export interface IField {
 export class Field {
     public Id: string;
     public Name: String;
-    public Area = 6767;
+    public Area = 767;
     public Code = 9823;
 
     constructor(ifield: IField) {
