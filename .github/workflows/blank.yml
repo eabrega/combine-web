@@ -1,0 +1,38 @@
+name: CI
+on: 
+  push:
+    branches:
+      - master
+      - main
+  pull_request:
+    branches:
+      - master
+jobs:
+   build:
+    runs-on: ubuntu-latest
+    steps:  
+      - name: Login
+        uses: docker/login-action@v1.6.0
+        with:
+          username: ${{ secrets.DOCKER_LOGIN }}
+          password: ${{ secrets.DOCKER_PASS }}
+      - uses: actions/checkout@v2
+      - name: docker build
+        run: |
+          docker build -t eabrega/combine-web:$GITHUB_RUN_NUMBER .
+          docker push eabrega/combine-web:$GITHUB_RUN_NUMBER
+          git tag b$GITHUB_RUN_NUMBER
+          git push origin --tags
+      - name: SSH Remote Commands
+        uses: appleboy/ssh-action@v0.1.4
+        env:
+          TAG: '${{ github.run_number }}'
+        with:
+          envs: TAG
+          host: ${{ secrets.DEPLOY_SERVER_IP }}
+          port: ${{ secrets.DEPLOY_SERVER_PORT }}
+          username: ${{ secrets.USER_NAME }}
+          key: ${{ secrets.KEY }}
+          script: |
+            docker rm -f combine-web-1
+            docker run -id -p 7201:80 --name combine-web-1 eabrega/combine-web:$TAG
