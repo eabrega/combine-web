@@ -19,8 +19,8 @@ export default new Vuex.Store({
     },
     actions: {
         getFields: async ({ commit }) => {
-            const fields = await loadFields().then();          
-            commit("SET_FIELDS", fields.map(f=> new Field(f)))
+            const fields = await loadFields().then();
+            commit("SET_FIELDS", fields.map(f => new Field(f)))
         }
     },
     getters: {
@@ -29,6 +29,6 @@ export default new Vuex.Store({
 })
 
 async function loadFields(): Promise<Array<IField>> {
-    let resp = await fetch("https://combine.hive-hh.ru/fields");
+    let resp = await fetch("https://api.combine.hive-hh.ru/fields");
     return resp.json();
 }
