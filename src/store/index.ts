@@ -29,6 +29,6 @@ export default new Vuex.Store({
 })
 
 async function loadFields(): Promise<Array<IField>> {
-    let resp = await fetch("http://localhost:51820/fields");
+    let resp = await fetch("https://combine.hive-hh.ru/fields");
     return resp.json();
 }
