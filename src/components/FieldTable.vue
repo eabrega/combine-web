@@ -11,7 +11,7 @@
             <template #cell(Id)="data">
                 {{ data.item.Id }}
             </template>
-            <template #cell(Name)="data" class="eblo">
+            <template #cell(Name)="data">
                 {{ data.item.Name }}
             </template>
             <template #cell(actions)="row">
@@ -30,7 +30,6 @@
             v-model="CURRENT_PAGE"
             :total-rows="TOTAL_ROWS"
             :per-page="SIZE"
-            aria-controls="my-table"
         ></b-pagination>
     </div>
 </template>
@@ -48,20 +47,35 @@ import store from "@/store";
 
 @Component
 export default class HelloWorld extends Vue {
+    constructor() {
+        super();
+
+        Vue.use(BootstrapVueIcons);
+        Vue.component("b-table", BTable);
+        Vue.component("b-spinner", BSpinner);
+        Vue.component("b-button", BButton);
+        Vue.component("b-pagination", BPagination);
+    }
+
     get CURRENT_PAGE() {
-        return 1;
+        return store.state.pageNumber
+    }
+
+    set CURRENT_PAGE(val: number) {
+        console.log(val);
+        store.dispatch("setPageNumber", val);
     }
 
     get TOTAL_ROWS() {
-        return 100;
+        return store.state.fields.TotalCount;
     }
 
     get SIZE() {
-        return 10;
+        return store.state.pageSize;
     }
 
     get ITEMS() {
-        return store.getters.FIELDS;
+        return store.state.fields.Items;
     }
 
     get IS_BUSY() {
@@ -94,20 +108,6 @@ export default class HelloWorld extends Vue {
     info(item: number) {
         alert(item);
     }
-
-    mounted() {
-
-    }
-
-    constructor() {
-        super();
-
-        Vue.use(BootstrapVueIcons);
-        Vue.component("b-table", BTable);
-        Vue.component("b-spinner", BSpinner);
-        Vue.component("b-button", BButton);
-        Vue.component("b-pagination", BPagination);
-    }
 }
 </script>
 
@@ -115,8 +115,5 @@ export default class HelloWorld extends Vue {
 .fields {
     width: 100%;
     text-align: left;
-    .eblo {
-        background-color: re;
-    }
 }
 </style>

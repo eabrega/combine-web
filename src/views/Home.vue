@@ -20,7 +20,7 @@ export default class Home extends Vue {
     }
 
     mounted() {
-        store.dispatch("getFields");
+        store.dispatch("setFields");
     }
 }
 </script>

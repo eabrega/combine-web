@@ -1,26 +1,40 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { Field, IField } from './fielad';
+import { FieldResponse, Field, IFieldsResponse } from './models/fielad';
 
 Vue.use(Vuex)
 
 export interface IState {
-    fields: Array<Field>;
+    pageUrl: string,
+    pageNumber: number,
+    pageSize: number,
+    fields: FieldResponse;
 }
 
 export default new Vuex.Store({
-    state: {
-        fields: Array<Field>()
-    } as IState,
+    state: () => ({
+        pageUrl: "https://api.combine.hive-hh.ru/fields",
+        pageNumber: 1,
+        pageSize: 20,
+        fields: {},
+    }) as IState,
     mutations: {
-        SET_FIELDS(state, val: Array<Field>) {
+        SET_FIELDS(state, val: FieldResponse) {
             state.fields = val;
+        },
+        SET_PAGE_NUMBER(state, val:number) {
+            state.pageNumber = val;
         }
     },
     actions: {
-        getFields: async ({ commit }) => {
-            const fields = await loadFields().then();
-            commit("SET_FIELDS", fields.map(f => new Field(f)))
+        setFields: async ({ state, commit }) => {
+            const fields = await loadFields(state).then();
+            commit("SET_FIELDS", new FieldResponse(fields))
+        },
+        setPageNumber: async ({state, commit }, val) => {
+            commit("SET_PAGE_NUMBER", val)
+            const fields = await loadFields(state).then();
+            commit("SET_FIELDS", new FieldResponse(fields))
         }
     },
     getters: {
@@ -28,7 +42,7 @@ export default new Vuex.Store({
     }
 })
 
-async function loadFields(): Promise<Array<IField>> {
-    let resp = await fetch("https://api.combine.hive-hh.ru/fields");
+async function loadFields(state: IState): Promise<IFieldsResponse> {
+    let resp = await fetch(`${state.pageUrl}/?page=${state.pageNumber}&size=${state.pageSize}`);   
     return resp.json();
 }
