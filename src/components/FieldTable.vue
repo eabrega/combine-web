@@ -1,11 +1,13 @@
 <template>
     <div class="fields">
         <b-table
+            id="fields"
             small
             hover
-            :items="ITEMS"
+            :items="loadFields"
             :fields="COULUMNS"
-            :busy="IS_BUSY"
+            :current-page="curentPage"
+            :per-page="pageSize"
             responsive="sm"
         >
             <template #cell(Id)="data">
@@ -15,9 +17,7 @@
                 {{ data.item.Name }}
             </template>
             <template #cell(actions)="row">
-                <b-button size="sm" @click="info(row.item.Id)" class="mr-1"
-                    >Dell</b-button
-                >
+                <b-button size="sm" @click="info(row.item.Id)" class="mr-1">Dell</b-button>
             </template>
             <template #table-busy>
                 <div class="text-center text-primary loading">
@@ -27,26 +27,29 @@
             </template>
         </b-table>
         <b-pagination
-            v-model="CURRENT_PAGE"
-            :total-rows="TOTAL_ROWS"
-            :per-page="SIZE"
+            v-if="total > pageSize"
+            v-model="curentPage"
+            :total-rows="total"
+            :per-page="pageSize"
+            aria-controls="fields"
         ></b-pagination>
     </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import {
-    BTable,
-    BootstrapVueIcons,
-    BSpinner,
-    BButton,
-    BPagination,
-} from "bootstrap-vue";
-import store from "@/store";
+import { Component, Prop, Vue } from "vue-property-decorator";
+import { Field, IFieldsResponse } from "../store/models/field";
+import { BTable, BootstrapVueIcons, BSpinner, BButton, BPagination } from "bootstrap-vue";
 
 @Component
-export default class HelloWorld extends Vue {
+export default class FieldTable2 extends Vue {
+    private curentPage = 1;
+    private total = 0;
+    private readonly baseURL = "https://api.combine.hive-hh.ru/fields/";
+
+    @Prop({ default: "Input Property" })
+    pageSize!: number;
+
     constructor() {
         super();
 
@@ -55,31 +58,6 @@ export default class HelloWorld extends Vue {
         Vue.component("b-spinner", BSpinner);
         Vue.component("b-button", BButton);
         Vue.component("b-pagination", BPagination);
-    }
-
-    get CURRENT_PAGE() {
-        return store.state.pageNumber
-    }
-
-    set CURRENT_PAGE(val: number) {
-        console.log(val);
-        store.dispatch("setPageNumber", val);
-    }
-
-    get TOTAL_ROWS() {
-        return store.state.fields.TotalCount;
-    }
-
-    get SIZE() {
-        return store.state.pageSize;
-    }
-
-    get ITEMS() {
-        return store.state.fields.Items;
-    }
-
-    get IS_BUSY() {
-        return false;
     }
 
     get COULUMNS() {
@@ -105,7 +83,20 @@ export default class HelloWorld extends Vue {
         ];
     }
 
-    info(item: number) {
+    async loadFields(ctx: any): Promise<Field[]> {
+        const response = (await fetch(this.URL(ctx.currentPage, ctx.perPage))).json() as Promise<
+            IFieldsResponse
+        >;
+
+        this.total = (await response).totalCount;
+        return (await response).items.map((i) => new Field(i));
+    }
+
+    private URL(page: number, size: number): string {
+        return `${this.baseURL}?page=${page}&size=${size}`;
+    }
+
+    private info(item: number) {
         alert(item);
     }
 }

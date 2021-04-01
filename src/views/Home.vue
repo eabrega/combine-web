@@ -1,13 +1,12 @@
 <template>
     <div class="home">
-        <FieldTable msg="Welcome to Your Vue.js + TypeScript App" />
+        <FieldTable :pageSize="20"/>
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import FieldTable from "@/components/FieldTable.vue";
-import store from "@/store";
 
 @Component({
     components: {
@@ -17,10 +16,6 @@ import store from "@/store";
 export default class Home extends Vue {
     constructor() {
         super();
-    }
-
-    mounted() {
-        store.dispatch("setFields");
     }
 }
 </script>
