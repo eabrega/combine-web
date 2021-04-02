@@ -1,5 +1,5 @@
 <template>
-    <div class="fields">
+    <div class="fields-table">
         <b-table
             id="fields"
             small
@@ -17,7 +17,7 @@
                 {{ data.item.Name }}
             </template>
             <template #cell(actions)="row">
-                <b-button size="sm" @click="info(row.item.Id)" class="mr-1">Dell</b-button>
+                <b-button size="sm" @click="info(row.item.Id)">Dell</b-button>
             </template>
             <template #table-busy>
                 <div class="text-center text-primary loading">
@@ -39,10 +39,9 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { Field, IFieldsResponse } from "../store/models/field";
-import { BTable, BootstrapVueIcons, BSpinner, BButton, BPagination } from "bootstrap-vue";
 
 @Component
-export default class FieldTable2 extends Vue {
+export default class FieldTable extends Vue {
     private curentPage = 1;
     private total = 0;
     private readonly baseURL = "https://api.combine.hive-hh.ru/fields/";
@@ -52,12 +51,6 @@ export default class FieldTable2 extends Vue {
 
     constructor() {
         super();
-
-        Vue.use(BootstrapVueIcons);
-        Vue.component("b-table", BTable);
-        Vue.component("b-spinner", BSpinner);
-        Vue.component("b-button", BButton);
-        Vue.component("b-pagination", BPagination);
     }
 
     get COULUMNS() {
@@ -79,6 +72,8 @@ export default class FieldTable2 extends Vue {
             },
             {
                 key: "actions",
+                label: "",
+                class: "actions",
             },
         ];
     }
@@ -102,9 +97,20 @@ export default class FieldTable2 extends Vue {
 }
 </script>
 
-<style scoped lang="scss">
-.fields {
+<style lang="scss">
+.fields-table {
     width: 100%;
     text-align: left;
+
+    .actions {
+        text-align: center !important;
+    }
+
+    .loading {
+        padding-top: 40px;
+        .align-middle {
+            margin-right: 10px;
+        }
+    }
 }
 </style>
